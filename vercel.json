@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "installCommand": "corepack enable && corepack prepare yarn@4.12.0 --activate && DATABASE_URL=\"${DATABASE_URL:-postgresql://build:build@127.0.0.1:5432/build}\" yarn --cwd web install && for p in node_modules package.json next.config.js public app tsconfig.json auth.ts lib components prisma types tailwind.config.ts postcss.config.js instrumentation-client.js; do ln -sfn \"web/$p\" \"$p\"; done",
-  "buildCommand": "DATABASE_URL=\"${DATABASE_URL:-postgresql://build:build@127.0.0.1:5432/build}\" NEXTAUTH_SECRET=\"${NEXTAUTH_SECRET:-build-only-placeholder-not-used-at-runtime}\" yarn --cwd web prisma generate && yarn --cwd web build && ln -sfn web/.next .next"
+  "installCommand": "bash scripts/vercel-install.sh",
+  "buildCommand": "bash scripts/vercel-build.sh"
 }
