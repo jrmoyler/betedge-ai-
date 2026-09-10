@@ -6,7 +6,12 @@ const nextConfig = {
   output: process.env.NEXT_OUTPUT_MODE,
   poweredByHeader: false,
   productionBrowserSourceMaps: false,
-  outputFileTracingRoot: process.env.NEXT_OUTPUT_MODE ? path.join(__dirname, '../') : '/',
+  // Trace from this app directory. `/` pulls in the whole image filesystem on
+  // Vercel; the parent-dir fallback is only for the hosted preview platform
+  // that sets NEXT_OUTPUT_MODE.
+  outputFileTracingRoot: process.env.NEXT_OUTPUT_MODE
+    ? path.join(__dirname, '../')
+    : path.join(__dirname),
   typescript: {
     ignoreBuildErrors: false,
   },
@@ -38,4 +43,3 @@ if (fs.existsSync(userConfigPath)) {
 }
 
 module.exports = nextConfig;
-
