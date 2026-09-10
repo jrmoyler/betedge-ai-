@@ -10,8 +10,9 @@ BetEdge AI is a full-stack sports betting research platform covering NFL, NBA, M
 
 ```
 betedge-ai/
-├── web/          # Next.js web application
+├── web/          # Next.js web application (Vercel deploy root)
 ├── mobile/       # React Native + Expo mobile app (iOS & Android)
+├── vercel.json   # Builds `web/` from the monorepo root
 ├── BetEdge_AI_Design_Plan.md
 └── propgpt_research.md
 ```
@@ -65,6 +66,25 @@ npx expo start
 Set `EXPO_PUBLIC_API_URL` to the deployed web app to run against the real backend.
 Unset, the app runs on bundled demo data and the login screen offers an explicit
 "Explore demo data" button.
+
+## Deploy (Vercel)
+
+The Next.js app lives in `web/`. A root `vercel.json` tells Vercel to install and
+build that directory (the linked project currently has no Root Directory set, so
+a root-level Next.js app is not detected otherwise).
+
+If you set **Root Directory** to `web` in the Vercel project settings, `web/vercel.json`
+takes over and the extra path mapping is skipped.
+
+Set these environment variables on the Vercel project (Production + Preview):
+
+| Name | Required | Notes |
+| --- | --- | --- |
+| `DATABASE_URL` | Yes for auth / saved picks | Postgres connection string |
+| `NEXTAUTH_SECRET` | Yes for auth | `openssl rand -base64 32` |
+| `NEXTAUTH_URL` | Recommended | Public origin, e.g. `https://your-app.vercel.app` |
+
+Sports, AI, Google, and Stripe keys stay optional — the same fallbacks as local apply.
 
 ## Authentication
 
