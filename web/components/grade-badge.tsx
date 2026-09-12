@@ -1,6 +1,5 @@
 'use client';
 import { cn } from '@/lib/utils';
-import { GRADE_COLORS } from '@/lib/sports-config';
 
 interface GradeBadgeProps {
   grade: string;
@@ -10,6 +9,14 @@ interface GradeBadgeProps {
   className?: string;
 }
 
+const tone: Record<string, string> = {
+  A: 'bg-yes/15 text-yes border-yes/25',
+  B: 'bg-primary/10 text-primary border-primary/20',
+  C: 'bg-warn/15 text-warn border-warn/25',
+  D: 'bg-no/15 text-no border-no/20',
+  F: 'bg-no/20 text-no border-no/30',
+};
+
 export function GradeBadge({
   grade,
   confidence,
@@ -17,29 +24,22 @@ export function GradeBadge({
   showConfidence = true,
   className,
 }: GradeBadgeProps) {
-  const color = GRADE_COLORS[grade ?? 'C'] ?? '#6B7280';
-  const sizeClasses = {
-    sm: 'h-7 w-7 text-xs',
-    md: 'h-10 w-10 text-base',
-    lg: 'h-14 w-14 text-xl',
-  };
-
+  const g = (grade ?? 'C').toUpperCase();
   return (
-    <div className={cn('flex items-center gap-2', className)}>
-      <div
-        className={cn(
-          'flex items-center justify-center rounded-lg font-bold font-mono',
-          sizeClasses[size]
-        )}
-        style={{ backgroundColor: `${color}20`, color }}
-      >
-        {grade ?? '?'}
-      </div>
-      {showConfidence && confidence != null && (
-        <span className="text-xs text-muted-foreground font-mono">
-          {confidence}%
-        </span>
+    <span
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-md border font-display font-semibold tabular',
+        tone[g] ?? tone.C,
+        size === 'sm' && 'px-1.5 py-0.5 text-xs',
+        size === 'md' && 'px-2 py-1 text-sm',
+        size === 'lg' && 'px-2.5 py-1.5 text-base',
+        className,
       )}
-    </div>
+    >
+      {g}
+      {showConfidence && confidence != null && (
+        <span className="font-sans text-[10px] font-medium opacity-80">{confidence}%</span>
+      )}
+    </span>
   );
 }

@@ -10,34 +10,32 @@ interface SportFilterProps {
 
 export function SportFilter({ selected, onSelect, className }: SportFilterProps) {
   return (
-    <div className={cn('flex items-center gap-2 overflow-x-auto pb-1', className)}>
+    <div className={cn('flex items-center gap-1.5 overflow-x-auto pb-1', className)}>
       <button
         onClick={() => onSelect('all')}
         className={cn(
-          'px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap',
+          'h-10 whitespace-nowrap rounded-md px-4 text-sm font-semibold transition-colors',
           selected === 'all'
-            ? 'bg-primary text-primary-foreground shadow-md'
-            : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80'
+            ? 'bg-primary text-primary-foreground'
+            : 'border border-border bg-secondary text-muted-foreground hover:text-foreground',
         )}
       >
-        All Sports
+        All
       </button>
       {SPORT_KEYS.map((key: SportKey) => {
         const sport = SPORTS[key];
         if (!sport) return null;
-        const Icon = sport.icon;
         return (
           <button
             key={key}
             onClick={() => onSelect(key)}
             className={cn(
-              'flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap',
+              'h-10 whitespace-nowrap rounded-md px-4 text-sm font-semibold transition-colors',
               selected === key
-                ? 'bg-primary text-primary-foreground shadow-md'
-                : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80'
+                ? 'bg-primary text-primary-foreground'
+                : 'border border-border bg-secondary text-muted-foreground hover:text-foreground',
             )}
           >
-            <Icon className="h-4 w-4" />
             {sport.shortName}
           </button>
         );

@@ -4,35 +4,48 @@
 
 @layer base {
   :root {
-    /* BetEdge AI - Deep navy dark theme */
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
-    --card: 217 33% 17%;
-    --card-foreground: 210 40% 98%;
-    --popover: 217 33% 17%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 142 71% 45%;
-    --primary-foreground: 222 47% 11%;
-    --secondary: 217 33% 22%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 22%;
-    --muted-foreground: 215 20% 63%;
-    --accent: 142 71% 45%;
-    --accent-foreground: 222 47% 11%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 10%;
-    --border: 217 33% 25%;
-    --input: 217 33% 25%;
-    --ring: 142 71% 45%;
-    --radius: 0.625rem;
-    --chart-1: 142 71% 45%;
-    --chart-2: 38 92% 50%;
-    --chart-3: 0 84% 60%;
-    --chart-4: 217 91% 60%;
-    --chart-5: 262 83% 58%;
-    --shadow-sm: 0 1px 3px 0 rgba(0,0,0,0.3), 0 1px 2px -1px rgba(0,0,0,0.3);
-    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -2px rgba(0,0,0,0.3);
-    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5), 0 4px 6px -4px rgba(0,0,0,0.4);
+    /* Near-black desk + mint accent — FanDuel board, Polymarket tape */
+    --background: 210 12% 3%;
+    --foreground: 210 17% 96%;
+    --card: 220 16% 7%;
+    --card-foreground: 210 17% 96%;
+    --popover: 215 21% 11%;
+    --popover-foreground: 210 17% 96%;
+    --primary: 155 70% 55%;
+    --primary-foreground: 155 54% 5%;
+    --secondary: 215 21% 11%;
+    --secondary-foreground: 210 17% 96%;
+    --muted: 215 20% 14%;
+    --muted-foreground: 213 9% 58%;
+    --accent: 155 70% 55%;
+    --accent-foreground: 155 54% 5%;
+    --destructive: 354 100% 71%;
+    --destructive-foreground: 210 12% 3%;
+    --border: 216 20% 15%;
+    --input: 216 20% 15%;
+    --ring: 155 70% 55%;
+    --radius: 0.75rem;
+
+    --elevated: 215 21% 11%;
+    --panel: 215 20% 14%;
+    --faint: 213 10% 40%;
+    --line-strong: 216 18% 20%;
+    --yes: 155 70% 55%;
+    --no: 354 100% 71%;
+    --warn: 36 73% 67%;
+    --live: 0 100% 65%;
+
+    --chart-1: 155 70% 55%;
+    --chart-2: 36 73% 67%;
+    --chart-3: 354 100% 71%;
+    --chart-4: 213 9% 58%;
+    --chart-5: 215 21% 11%;
+
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.4);
+    --shadow-md: 0 8px 24px -12px rgb(0 0 0 / 0.55);
+    --shadow-lg: 0 12px 40px -16px rgb(0 0 0 / 0.6);
+    --shadow-lift: 0 12px 40px -16px rgb(0 0 0 / 0.55);
+
     --duration-fast: 150ms;
     --duration-normal: 250ms;
     --duration-slow: 350ms;
@@ -50,52 +63,144 @@
   * {
     @apply border-border;
   }
+
+  html {
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: 'rlig' 1, 'calt' 1;
+    font-feature-settings: "rlig" 1, "calt" 1, "tnum" 1;
+    letter-spacing: -0.011em;
+    min-height: 100dvh;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.35);
+    color: hsl(var(--foreground));
   }
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: hsl(222 47% 11%);
-}
-::-webkit-scrollbar-thumb {
-  background: hsl(217 33% 30%);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(217 33% 40%);
+@layer components {
+  .desk-grid {
+    background-image:
+      linear-gradient(to right, hsl(var(--foreground) / 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--foreground) / 0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  .odds-btn {
+    @apply relative flex min-h-11 flex-col items-center justify-center gap-0.5 rounded-md border border-border bg-secondary px-2 py-1.5 text-center transition-colors duration-150;
+  }
+  .odds-btn:hover {
+    border-color: hsl(var(--line-strong));
+    background: hsl(var(--panel));
+  }
+  .odds-btn:active {
+    transform: scale(0.98);
+  }
+  .odds-btn[data-selected="true"] {
+    border-color: hsl(var(--primary) / 0.55);
+    background: color-mix(in oklab, hsl(var(--primary)) 12%, hsl(var(--elevated)));
+  }
+
+  .prob-track {
+    @apply relative h-2 overflow-hidden rounded-full;
+    background: hsl(var(--panel));
+  }
+
+  .ticker-mask {
+    mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  }
+
+  .live-dot {
+    @apply relative inline-block h-1.5 w-1.5 rounded-full;
+    background: hsl(var(--live));
+  }
+  .live-dot::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: 999px;
+    background: hsl(var(--live) / 0.4);
+    animation: pulse-live 1.6s ease-out infinite;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1, "ss01" 1;
+  }
 }
 
-/* Grade colors */
-.grade-a { color: #22C55E; }
-.grade-b { color: #3B82F6; }
-.grade-c { color: #F59E0B; }
-.grade-d { color: #F97316; }
-.grade-f { color: #EF4444; }
+@keyframes pulse-live {
+  0% { transform: scale(0.6); opacity: 0.7; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
 
-.grade-bg-a { background-color: rgba(34,197,94,0.15); }
-.grade-bg-b { background-color: rgba(59,130,246,0.15); }
-.grade-bg-c { background-color: rgba(245,158,11,0.15); }
-.grade-bg-d { background-color: rgba(249,115,22,0.15); }
-.grade-bg-f { background-color: rgba(239,68,68,0.15); }
+@keyframes tape {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
 
-/* Blur paywall */
+.animate-tape {
+  animation: tape 42s linear infinite;
+}
+
+.grade-a { color: hsl(var(--yes)); }
+.grade-b { color: hsl(var(--primary)); }
+.grade-c { color: hsl(var(--warn)); }
+.grade-d { color: hsl(var(--no)); }
+.grade-f { color: hsl(var(--no)); }
+
+.grade-bg-a { background-color: hsl(var(--yes) / 0.15); }
+.grade-bg-b { background-color: hsl(var(--primary) / 0.12); }
+.grade-bg-c { background-color: hsl(var(--warn) / 0.15); }
+.grade-bg-d { background-color: hsl(var(--no) / 0.15); }
+.grade-bg-f { background-color: hsl(var(--no) / 0.2); }
+
 .paywall-blur {
   filter: blur(6px);
   pointer-events: none;
   user-select: none;
 }
 
-/* Count-up animation */
 @keyframes countUp {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-count-up {
   animation: countUp 0.6s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-tape,
+  .live-dot::after,
+  .animate-count-up {
+    animation: none;
+  }
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: hsl(var(--background)); }
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--line-strong));
+  border-radius: 99px;
 }

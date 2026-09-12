@@ -10,7 +10,9 @@ import { PickCardSkeleton } from '@/components/loading-skeleton';
 import type { SportKey } from '@/lib/sports-config';
 import { useRouter } from 'next/navigation';
 import { addPickToParlay, savePickToTracker } from '@/lib/pick-actions';
-import { TrendingUp, Flame, Clock } from 'lucide-react';
+import { useOnboarding } from '@/lib/onboarding-store';
+import { useMounted } from '@/components/client-only';
+import Link from 'next/link';
 
 interface PickData {
   id: string;
@@ -33,6 +35,8 @@ export function DashboardContent() {
   const [picks, setPicks] = useState<PickData[]>([]);
   const [totalPicks, setTotalPicks] = useState(0);
   const [loading, setLoading] = useState(true);
+  const mounted = useMounted();
+  const onboardingDone = useOnboarding((s) => s.done);
 
   const tier = session?.user?.subscriptionTier ?? 'FREE';
 
@@ -55,63 +59,57 @@ export function DashboardContent() {
     loadPicks();
   }, [sport]);
 
+  const aGrades = (picks ?? []).filter((p: PickData) => p?.grade === 'A').length;
+
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="flex min-h-screen flex-col bg-background">
       <AppHeader />
-      <main className="flex-1 mx-auto max-w-7xl w-full px-4 py-6">
-        {/* Header */}
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6">
         <div className="mb-6">
-          <div className="flex items-center gap-2 mb-1">
-            <Flame className="h-5 w-5 text-primary" />
-            <h1 className="font-display text-2xl font-bold text-foreground tracking-tight">
-              Today&apos;s AI Picks
-            </h1>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            AI-graded picks refreshed throughout the day. Tap any pick for full analysis.
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Today's desk
+          </p>
+          <h1 className="font-display text-3xl font-semibold tracking-tight">
+            Graded tickets
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            AI-graded numbers, refreshed through the window. Tap any ticket for the packet.
           </p>
         </div>
 
-        {/* Sport filter */}
+        {mounted && !onboardingDone && (
+          <Link
+            href="/onboarding"
+            className="mb-6 flex items-center justify-between rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm"
+          >
+            <span>Finish onboarding to set a unit and the sports you follow.</span>
+            <span className="font-semibold text-primary">Open</span>
+          </Link>
+        )}
+
         <SportFilter selected={sport} onSelect={setSport} className="mb-6" />
 
-        {/* Stats row */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          <div className="bg-card rounded-xl p-3 border border-border/50">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
-              <TrendingUp className="h-3 w-3" /> Today&apos;s Picks
+        <div className="mb-6 grid grid-cols-3 gap-3">
+          {[
+            { k: "Today's picks", v: String(totalPicks || (picks?.length ?? 0)) },
+            { k: 'A-grade', v: String(aGrades) },
+            { k: 'Locked', v: tier === 'FREE' ? String(Math.max(0, totalPicks - picks.length)) : '∞' },
+          ].map((s) => (
+            <div key={s.k} className="rounded-xl border border-border bg-card p-3">
+              <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">{s.k}</p>
+              <p className="mt-1 font-display text-xl font-semibold tabular text-foreground">{s.v}</p>
             </div>
-            <span className="text-lg font-bold font-mono text-foreground">
-              {totalPicks || (picks?.length ?? 0)}
-            </span>
-          </div>
-          <div className="bg-card rounded-xl p-3 border border-border/50">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
-              <Flame className="h-3 w-3" /> A-Grade
-            </div>
-            <span className="text-lg font-bold font-mono text-primary">
-              {(picks ?? []).filter((p: PickData) => p?.grade === 'A').length}
-            </span>
-          </div>
-          <div className="bg-card rounded-xl p-3 border border-border/50">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
-              <Clock className="h-3 w-3" /> Locked
-            </div>
-            <span className="text-lg font-bold font-mono text-foreground">
-              {tier === 'FREE' ? Math.max(0, totalPicks - picks.length) : '∞'}
-            </span>
-          </div>
+          ))}
         </div>
 
-        {/* Picks grid */}
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {Array.from({ length: 4 }).map((_: unknown, i: number) => (
               <PickCardSkeleton key={i} />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {(picks ?? []).map((pick: PickData, i: number) => (
               <PickCard
                 key={pick?.id ?? i}
@@ -136,10 +134,11 @@ export function DashboardContent() {
         )}
 
         {(picks ?? []).length === 0 && !loading && (
-          <div className="text-center py-16">
-            <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-foreground mb-1">No picks available</h3>
-            <p className="text-sm text-muted-foreground">Check back later — picks are refreshed throughout the day.</p>
+          <div className="rounded-2xl border border-border bg-card px-6 py-16 text-center">
+            <h3 className="font-display text-lg font-semibold">No tickets graded yet</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Check back later — the desk refreshes throughout the day.
+            </p>
           </div>
         )}
       </main>

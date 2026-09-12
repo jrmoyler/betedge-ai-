@@ -1,28 +1,24 @@
 'use client';
-import { Shield } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { Logo } from '@/components/brand/logo';
 
 export function AppFooter() {
-  // Rendering the real year during SSR would mismatch a client in a different
-  // timezone, so start from a fixed value and correct it after mount.
   const [year, setYear] = useState(2026);
-  useEffect(() => { setYear(new Date().getFullYear()); }, []);
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
 
   return (
-    <footer className="border-t border-border/50 bg-background/80">
-      <div className="mx-auto max-w-7xl px-4 py-6">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Shield className="h-4 w-4 text-primary" />
-            <span className="text-sm text-muted-foreground">
-              BetEdge AI © {year}
-            </span>
-          </div>
-          <p className="text-xs text-muted-foreground text-center max-w-md">
-            Powered by educational analysis only — 21+ | Gamble Responsibly.
-            This tool does not guarantee wins. Please bet within your means.
-          </p>
+    <footer className="border-t border-border bg-background">
+      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-3">
+          <Logo />
+          <span className="text-xs text-muted-foreground">© {year}</span>
         </div>
+        <p className="max-w-md text-xs leading-relaxed text-muted-foreground">
+          Research only — 21+ | Gamble responsibly. BetEdge does not take action and does not
+          guarantee wins. If it stops being fun, stop. 1-800-GAMBLER.
+        </p>
       </div>
     </footer>
   );
