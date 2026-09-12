@@ -66,7 +66,7 @@ export function AccountContent() {
             <h2 className="font-semibold text-foreground mb-4">Subscription</h2>
             <div className="flex items-center gap-3 mb-4">
               <div className={`px-3 py-1.5 rounded-lg text-sm font-bold ${
-                tier === 'ELITE' ? 'bg-amber-500/20 text-amber-400' :
+                tier === 'ELITE' ? 'bg-primary/20 text-primary' :
                 tier === 'PRO' ? 'bg-primary/20 text-primary' :
                 'bg-muted text-muted-foreground'
               }`}>

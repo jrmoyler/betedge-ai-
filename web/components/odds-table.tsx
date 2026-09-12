@@ -30,60 +30,62 @@ function isBest(values: (number | undefined)[], idx: number, preferHigher: boole
 
 export function OddsTable({ odds, homeTeam, awayTeam, maxBooks, className }: OddsTableProps) {
   const displayOdds = maxBooks ? (odds ?? []).slice(0, maxBooks) : (odds ?? []);
+  const awayShort = awayTeam?.split(' ')?.pop() ?? 'Away';
+  const homeShort = homeTeam?.split(' ')?.pop() ?? 'Home';
 
   return (
     <div className={cn('overflow-x-auto', className)}>
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-border">
-            <th className="text-left py-2 px-3 text-xs text-muted-foreground font-medium">Book</th>
-            <th className="text-center py-2 px-3 text-xs text-muted-foreground font-medium" colSpan={2}>Spread</th>
-            <th className="text-center py-2 px-3 text-xs text-muted-foreground font-medium" colSpan={2}>Moneyline</th>
-            <th className="text-center py-2 px-3 text-xs text-muted-foreground font-medium" colSpan={2}>Total</th>
+            <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Book</th>
+            <th className="px-3 py-2 text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground" colSpan={2}>Spread</th>
+            <th className="px-3 py-2 text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground" colSpan={2}>Moneyline</th>
+            <th className="px-3 py-2 text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground" colSpan={2}>Total</th>
           </tr>
-          <tr className="border-b border-border/50">
-            <th className="py-1 px-3" />
-            <th className="text-center py-1 px-2 text-xs text-muted-foreground">{awayTeam?.split(' ')?.pop() ?? 'Away'}</th>
-            <th className="text-center py-1 px-2 text-xs text-muted-foreground">{homeTeam?.split(' ')?.pop() ?? 'Home'}</th>
-            <th className="text-center py-1 px-2 text-xs text-muted-foreground">{awayTeam?.split(' ')?.pop() ?? 'Away'}</th>
-            <th className="text-center py-1 px-2 text-xs text-muted-foreground">{homeTeam?.split(' ')?.pop() ?? 'Home'}</th>
-            <th className="text-center py-1 px-2 text-xs text-muted-foreground">Over</th>
-            <th className="text-center py-1 px-2 text-xs text-muted-foreground">Under</th>
+          <tr className="border-b border-border/60">
+            <th className="px-3 py-1" />
+            <th className="px-2 py-1 text-center text-xs text-muted-foreground">{awayShort}</th>
+            <th className="px-2 py-1 text-center text-xs text-muted-foreground">{homeShort}</th>
+            <th className="px-2 py-1 text-center text-xs text-muted-foreground">{awayShort}</th>
+            <th className="px-2 py-1 text-center text-xs text-muted-foreground">{homeShort}</th>
+            <th className="px-2 py-1 text-center text-xs text-muted-foreground">Over</th>
+            <th className="px-2 py-1 text-center text-xs text-muted-foreground">Under</th>
           </tr>
         </thead>
         <tbody>
           {displayOdds.map((row: OddsRow, i: number) => (
-            <tr key={row?.bookmaker ?? i} className="border-b border-border/30 hover:bg-secondary/50 transition-colors">
-              <td className="py-2.5 px-3 font-medium text-foreground">{row?.bookmaker ?? 'Unknown'}</td>
-              <td className={cn('text-center py-2.5 px-2 font-mono text-sm',
-                isBest(displayOdds.map((o: OddsRow) => o?.spread?.awayOdds), i, true) && 'text-primary font-bold'
+            <tr key={row?.bookmaker ?? i} className="border-b border-border/40 hover:bg-secondary/60">
+              <td className="px-3 py-2.5 font-medium">{row?.bookmaker ?? 'Unknown'}</td>
+              <td className={cn('px-2 py-2.5 text-center font-mono text-sm tabular',
+                isBest(displayOdds.map((o) => o?.spread?.awayOdds), i, true) && 'font-semibold text-primary'
               )}>
                 {row?.spread ? `${row.spread.away > 0 ? '+' : ''}${row.spread.away} (${formatOdds(row.spread.awayOdds)})` : '—'}
               </td>
-              <td className={cn('text-center py-2.5 px-2 font-mono text-sm',
-                isBest(displayOdds.map((o: OddsRow) => o?.spread?.homeOdds), i, true) && 'text-primary font-bold'
+              <td className={cn('px-2 py-2.5 text-center font-mono text-sm tabular',
+                isBest(displayOdds.map((o) => o?.spread?.homeOdds), i, true) && 'font-semibold text-primary'
               )}>
                 {row?.spread ? `${row.spread.home > 0 ? '+' : ''}${row.spread.home} (${formatOdds(row.spread.homeOdds)})` : '—'}
               </td>
-              <td className={cn('text-center py-2.5 px-2 font-mono text-sm',
-                isBest(displayOdds.map((o: OddsRow) => o?.moneyline?.away), i, true) && 'text-primary font-bold'
+              <td className={cn('px-2 py-2.5 text-center font-mono text-sm tabular',
+                isBest(displayOdds.map((o) => o?.moneyline?.away), i, true) && 'font-semibold text-primary'
               )}>
                 {formatOdds(row?.moneyline?.away)}
               </td>
-              <td className={cn('text-center py-2.5 px-2 font-mono text-sm',
-                isBest(displayOdds.map((o: OddsRow) => o?.moneyline?.home), i, true) && 'text-primary font-bold'
+              <td className={cn('px-2 py-2.5 text-center font-mono text-sm tabular',
+                isBest(displayOdds.map((o) => o?.moneyline?.home), i, true) && 'font-semibold text-primary'
               )}>
                 {formatOdds(row?.moneyline?.home)}
               </td>
-              <td className={cn('text-center py-2.5 px-2 font-mono text-sm',
-                isBest(displayOdds.map((o: OddsRow) => o?.total?.over), i, true) && 'text-primary font-bold'
+              <td className={cn('px-2 py-2.5 text-center font-mono text-sm tabular',
+                isBest(displayOdds.map((o) => o?.total?.over), i, true) && 'font-semibold text-primary'
               )}>
-                {row?.total ? `O ${row.total.line} (${formatOdds(row.total.over)})` : '—'}
+                {row?.total ? `${row.total.line} (${formatOdds(row.total.over)})` : '—'}
               </td>
-              <td className={cn('text-center py-2.5 px-2 font-mono text-sm',
-                isBest(displayOdds.map((o: OddsRow) => o?.total?.under), i, true) && 'text-primary font-bold'
+              <td className={cn('px-2 py-2.5 text-center font-mono text-sm tabular',
+                isBest(displayOdds.map((o) => o?.total?.under), i, true) && 'font-semibold text-primary'
               )}>
-                {row?.total ? `U ${row.total.line} (${formatOdds(row.total.under)})` : '—'}
+                {row?.total ? formatOdds(row.total.under) : '—'}
               </td>
             </tr>
           ))}

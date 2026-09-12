@@ -5,7 +5,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
-  Gamepad2,
+  Gauge,
   Target,
   Layers,
   ClipboardList,
@@ -14,16 +14,20 @@ import {
   LogOut,
   Menu,
   X,
-  Shield,
-  Zap,
+  Ticket,
   ChevronDown,
 } from 'lucide-react';
 import { useState } from 'react';
+import { Logo } from '@/components/brand/logo';
+import { Ticker } from '@/components/ticker';
+import { BetSlip } from '@/components/bet-slip';
+import { useParlayStore } from '@/lib/parlay-store';
+import { useMounted } from '@/components/client-only';
 
 const NAV_ITEMS = [
-  { href: '/dashboard', label: 'Picks', icon: LayoutDashboard },
-  { href: '/games', label: 'Games', icon: Gamepad2 },
-  { href: '/props', label: 'Props', icon: Target },
+  { href: '/dashboard', label: 'Desk', icon: LayoutDashboard },
+  { href: '/games', label: 'Sports', icon: Gauge },
+  { href: '/props', label: 'Research', icon: Target },
   { href: '/parlay-builder', label: 'Parlay', icon: Layers },
   { href: '/tracker', label: 'Tracker', icon: ClipboardList },
   { href: '/alerts', label: 'Alerts', icon: Bell },
@@ -34,147 +38,174 @@ export function AppHeader() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [slipOpen, setSlipOpen] = useState(false);
+  const mounted = useMounted();
+  const legs = useParlayStore((s) => s.legs);
+  const slipCount = mounted ? legs.length : 0;
   const tier = session?.user?.subscriptionTier ?? 'FREE';
+  const showNav = Boolean(session) || (pathname && pathname !== '/' && pathname !== '/login' && pathname !== '/signup' && pathname !== '/onboarding');
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto max-w-7xl px-4 flex items-center justify-between h-14">
-        {/* Logo */}
-        <Link href={session ? '/dashboard' : '/'} className="flex items-center gap-2 shrink-0">
-          <div className="h-8 w-8 rounded-lg bg-primary/20 flex items-center justify-center">
-            <Shield className="h-5 w-5 text-primary" />
-          </div>
-          <span className="font-display font-bold text-lg text-foreground tracking-tight hidden sm:block">
-            BetEdge <span className="text-primary">AI</span>
-          </span>
-        </Link>
+    <>
+      <header className="sticky top-0 z-50 w-full border-b border-border bg-background/85 backdrop-blur-md">
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
+          <Logo href={session ? '/dashboard' : '/'} />
 
-        {/* Desktop nav */}
-        {session && (
-          <nav className="hidden md:flex items-center gap-1">
-            {NAV_ITEMS.map((item: typeof NAV_ITEMS[number]) => {
-              const Icon = item.icon;
-              const isActive = pathname?.startsWith(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
-                    isActive
-                      ? 'bg-primary/15 text-primary'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
-                  )}
-                >
-                  <Icon className="h-4 w-4" />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
-        )}
-
-        {/* Right side */}
-        <div className="flex items-center gap-2">
-          {session ? (
-            <>
-              {tier === 'FREE' && (
-                <Link
-                  href="/upgrade"
-                  className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                >
-                  <Zap className="h-3 w-3" /> Upgrade
-                </Link>
-              )}
-              {tier !== 'FREE' && (
-                <span className="hidden sm:flex items-center gap-1 px-2 py-1 rounded text-xs font-bold bg-primary/20 text-primary">
-                  {tier}
-                </span>
-              )}
-
-              {/* User dropdown */}
-              <div className="relative">
-                <button
-                  onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-                >
-                  <User className="h-4 w-4" />
-                  <span className="hidden sm:inline text-xs">{session?.user?.name ?? session?.user?.email?.split('@')?.[0] ?? 'User'}</span>
-                  <ChevronDown className="h-3 w-3" />
-                </button>
-                {userMenuOpen && (
-                  <div className="absolute right-0 top-full mt-1 w-48 bg-card border border-border rounded-xl shadow-lg py-1 z-50">
-                    <Link
-                      href="/account"
-                      onClick={() => setUserMenuOpen(false)}
-                      className="flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-secondary transition-colors"
-                    >
-                      <User className="h-4 w-4" /> Account
-                    </Link>
-                    <button
-                      onClick={() => signOut({ redirectTo: '/' })}
-                      className="flex items-center gap-2 px-3 py-2 text-sm text-destructive hover:bg-secondary transition-colors w-full text-left"
-                    >
-                      <LogOut className="h-4 w-4" /> Sign Out
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Mobile menu toggle */}
-              <button
-                onClick={() => setMobileOpen(!mobileOpen)}
-                className="md:hidden p-2 rounded-lg hover:bg-secondary text-muted-foreground"
-              >
-                {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </button>
-            </>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Link
-                href="/login"
-                className="px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-              >
-                Log In
-              </Link>
-              <Link
-                href="/signup"
-                className="px-4 py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-              >
-                Sign Up
-              </Link>
-            </div>
+          {showNav && (
+            <nav className="hidden items-center gap-1 md:flex">
+              {NAV_ITEMS.map((item) => {
+                const Icon = item.icon;
+                const isActive = pathname?.startsWith(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+                      isActive
+                        ? 'bg-primary/15 text-primary'
+                        : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
+                    )}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
           )}
-        </div>
-      </div>
 
-      {/* Mobile nav */}
-      {session && mobileOpen && (
-        <div className="md:hidden border-t border-border/50 bg-background/95 backdrop-blur-xl">
-          <nav className="max-w-7xl mx-auto px-4 py-2 space-y-1">
-            {NAV_ITEMS.map((item: typeof NAV_ITEMS[number]) => {
-              const Icon = item.icon;
-              const isActive = pathname?.startsWith(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileOpen(false)}
-                  className={cn(
-                    'flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
-                    isActive
-                      ? 'bg-primary/15 text-primary'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+          <div className="flex items-center gap-1.5">
+            {showNav && (
+              <button
+                type="button"
+                onClick={() => setSlipOpen(true)}
+                className="relative grid size-9 place-items-center rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground"
+                aria-label="Open bet slip"
+              >
+                <Ticket className="h-4 w-4" />
+                {slipCount > 0 && (
+                  <span className="absolute -right-0.5 -top-0.5 grid size-4 place-items-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
+                    {slipCount}
+                  </span>
+                )}
+              </button>
+            )}
+
+            {session ? (
+              <>
+                {tier === 'FREE' && (
+                  <Link
+                    href="/upgrade"
+                    className="hidden h-8 items-center rounded-md bg-primary px-3 text-xs font-semibold text-primary-foreground hover:bg-primary/90 sm:flex"
+                  >
+                    Upgrade
+                  </Link>
+                )}
+                {tier !== 'FREE' && (
+                  <span className="hidden rounded-md bg-primary/15 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary sm:inline">
+                    {tier}
+                  </span>
+                )}
+
+                <div className="relative">
+                  <button
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm text-muted-foreground hover:bg-secondary hover:text-foreground"
+                  >
+                    <User className="h-4 w-4" />
+                    <span className="hidden text-xs sm:inline">
+                      {session?.user?.name ?? session?.user?.email?.split('@')?.[0] ?? 'User'}
+                    </span>
+                    <ChevronDown className="h-3 w-3" />
+                  </button>
+                  {userMenuOpen && (
+                    <div className="absolute right-0 top-full z-50 mt-1 w-48 overflow-hidden rounded-xl border border-border bg-popover py-1 shadow-lift">
+                      <Link
+                        href="/account"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-secondary"
+                      >
+                        <User className="h-4 w-4" /> Account
+                      </Link>
+                      <button
+                        onClick={() => signOut({ redirectTo: '/' })}
+                        className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-destructive hover:bg-secondary"
+                      >
+                        <LogOut className="h-4 w-4" /> Sign Out
+                      </button>
+                    </div>
                   )}
+                </div>
+
+                <button
+                  onClick={() => setMobileOpen(!mobileOpen)}
+                  className="grid size-9 place-items-center rounded-md text-muted-foreground hover:bg-secondary md:hidden"
                 >
-                  <Icon className="h-4 w-4" />
-                  {item.label}
+                  {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                </button>
+              </>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/login"
+                  className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                >
+                  Sign in
                 </Link>
-              );
-            })}
-          </nav>
+                <Link
+                  href="/onboarding"
+                  className="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                >
+                  Open the desk
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {session && mobileOpen && (
+          <div className="border-t border-border bg-background/95 backdrop-blur-md md:hidden">
+            <nav className="mx-auto max-w-7xl space-y-1 px-4 py-2">
+              {NAV_ITEMS.map((item) => {
+                const Icon = item.icon;
+                const isActive = pathname?.startsWith(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    className={cn(
+                      'flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium',
+                      isActive
+                        ? 'bg-primary/15 text-primary'
+                        : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
+                    )}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+        )}
+        <Ticker />
+      </header>
+
+      {slipOpen && (
+        <div className="fixed inset-0 z-[60]">
+          <button
+            type="button"
+            className="absolute inset-0 bg-background/60 backdrop-blur-sm"
+            onClick={() => setSlipOpen(false)}
+            aria-label="Dismiss slip"
+          />
+          <aside className="absolute right-0 top-0 h-full w-full max-w-sm border-l border-border bg-card shadow-lift">
+            <BetSlip onClose={() => setSlipOpen(false)} />
+          </aside>
         </div>
       )}
-    </header>
+    </>
   );
 }

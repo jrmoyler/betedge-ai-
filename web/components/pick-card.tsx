@@ -1,9 +1,8 @@
 'use client';
 import { cn } from '@/lib/utils';
 import { GradeBadge } from './grade-badge';
-import { SPORTS, RECOMMENDATION_COLORS, type SportKey } from '@/lib/sports-config';
-import { Bookmark, Plus, TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { SPORTS, type SportKey } from '@/lib/sports-config';
+import { Bookmark, Plus } from 'lucide-react';
 
 interface PickCardProps {
   id: string;
@@ -23,6 +22,11 @@ interface PickCardProps {
   onClick?: () => void;
 }
 
+function formatOdds(val: number) {
+  if (!Number.isFinite(val)) return '—';
+  return val > 0 ? `+${val}` : `${val}`;
+}
+
 export function PickCard({
   playerName,
   team,
@@ -40,92 +44,79 @@ export function PickCard({
   onClick,
 }: PickCardProps) {
   const sportConfig = SPORTS[sport];
-  const SportIcon = sportConfig?.icon;
-  const recColor = RECOMMENDATION_COLORS[recommendation] ?? '#6B7280';
-
   const isOver = recommendation?.toLowerCase()?.includes('over');
-  const isUnder = recommendation?.toLowerCase()?.includes('under');
-  const RecIcon = isOver ? TrendingUp : isUnder ? TrendingDown : Minus;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+    <article
       onClick={onClick}
       className={cn(
-        'group relative bg-card rounded-xl p-4 cursor-pointer transition-all hover:shadow-lg border border-border/50',
-        blurred && 'paywall-blur'
+        'group relative cursor-pointer rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/30',
+        blurred && 'paywall-blur',
       )}
-      style={{ boxShadow: 'var(--shadow-sm)' }}
     >
-      {/* Header row */}
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-3">
-          <GradeBadge grade={grade} confidence={confidence} size="md" />
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-semibold text-foreground">{playerName ?? 'Unknown'}</span>
-              <span className="text-xs text-muted-foreground bg-secondary px-1.5 py-0.5 rounded">
-                {team ?? ''}
-              </span>
-            </div>
-            <div className="flex items-center gap-2 mt-0.5">
-              {SportIcon && <SportIcon className="h-3 w-3 text-muted-foreground" />}
-              <span className="text-xs text-muted-foreground">{sportConfig?.shortName}</span>
-              <span className="text-xs text-muted-foreground">·</span>
-              <span className="text-xs text-muted-foreground">{statType}</span>
-            </div>
+      <div className="mb-3 flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <p className="truncate font-display text-base font-semibold leading-tight">
+              {playerName ?? 'Unknown'}
+            </p>
+            <span className="rounded-md bg-secondary px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              {team ?? ''}
+            </span>
           </div>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {sportConfig?.shortName} · {statType}
+          </p>
         </div>
+        <GradeBadge grade={grade} confidence={confidence} size="sm" />
+      </div>
 
-        {/* Recommendation badge */}
+      <div className="mb-3 grid grid-cols-3 gap-1.5">
+        <div className="rounded-md border border-border bg-secondary px-2 py-2 text-center">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Line</p>
+          <p className="font-mono text-sm font-semibold tabular">{line ?? 0}</p>
+        </div>
+        <div className="rounded-md border border-border bg-secondary px-2 py-2 text-center">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Best</p>
+          <p className={cn('font-mono text-sm font-semibold tabular', (odds ?? 0) > 0 ? 'text-yes' : 'text-foreground')}>
+            {formatOdds(odds ?? 0)}
+          </p>
+        </div>
         <div
-          className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold"
-          style={{ backgroundColor: `${recColor}20`, color: recColor }}
+          className={cn(
+            'rounded-md border px-2 py-2 text-center',
+            isOver ? 'border-yes/30 bg-yes/10 text-yes' : 'border-no/30 bg-no/10 text-no',
+          )}
         >
-          <RecIcon className="h-3 w-3" />
-          {recommendation ?? 'N/A'}
+          <p className="text-[10px] font-medium uppercase tracking-wider opacity-80">Rec</p>
+          <p className="text-xs font-semibold uppercase">{recommendation ?? 'N/A'}</p>
         </div>
       </div>
 
-      {/* Line + Odds */}
-      <div className="flex items-center gap-4 mb-3">
-        <div className="bg-secondary rounded-lg px-3 py-1.5">
-          <span className="text-xs text-muted-foreground">Line</span>
-          <span className="block text-sm font-mono font-semibold text-foreground">
-            {line ?? 0}
-          </span>
-        </div>
-        <div className="bg-secondary rounded-lg px-3 py-1.5">
-          <span className="text-xs text-muted-foreground">Best Odds</span>
-          <span className="block text-sm font-mono font-semibold text-foreground">
-            {(odds ?? 0) > 0 ? `+${odds}` : odds}
-          </span>
-        </div>
-      </div>
-
-      {/* Edge summary */}
-      <p className="text-sm text-muted-foreground leading-relaxed mb-3 line-clamp-2">
+      <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
         {edgeSummary ?? ''}
       </p>
 
-      {/* Action buttons — always visible on touch, hover-revealed from md up.
-          `opacity-0` alone left them unusable on phones, which have no hover. */}
-      <div className="flex items-center gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:focus-within:opacity-100 transition-opacity">
+      <div className="flex items-center gap-2">
         <button
-          onClick={(e: React.MouseEvent) => { e.stopPropagation(); onSave?.(); }}
-          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary bg-secondary px-2.5 py-1.5 rounded-lg transition-colors"
+          onClick={(e: React.MouseEvent) => {
+            e.stopPropagation();
+            onSave?.();
+          }}
+          className="inline-flex h-9 items-center gap-1 rounded-md border border-border bg-secondary px-3 text-xs font-medium text-muted-foreground hover:text-foreground"
         >
           <Bookmark className="h-3 w-3" /> Save
         </button>
         <button
-          onClick={(e: React.MouseEvent) => { e.stopPropagation(); onAddParlay?.(); }}
-          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary bg-secondary px-2.5 py-1.5 rounded-lg transition-colors"
+          onClick={(e: React.MouseEvent) => {
+            e.stopPropagation();
+            onAddParlay?.();
+          }}
+          className="inline-flex h-9 items-center gap-1 rounded-md border border-border bg-secondary px-3 text-xs font-medium text-muted-foreground hover:text-foreground"
         >
-          <Plus className="h-3 w-3" /> Add to Parlay
+          <Plus className="h-3 w-3" /> Add to slip
         </button>
       </div>
-    </motion.div>
+    </article>
   );
 }

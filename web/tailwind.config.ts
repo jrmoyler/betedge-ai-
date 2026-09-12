@@ -15,15 +15,10 @@ const config: Config = {
         display: ['var(--font-display)', 'var(--font-sans)', 'sans-serif'],
         mono: ['var(--font-mono)', 'ui-monospace', 'monospace'],
       },
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic':
-          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-      },
       borderRadius: {
         lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        md: 'calc(var(--radius) - 4px)',
+        sm: 'calc(var(--radius) - 8px)',
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -59,6 +54,13 @@ const config: Config = {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
+        elevated: 'hsl(var(--elevated))',
+        panel: 'hsl(var(--panel))',
+        faint: 'hsl(var(--faint))',
+        yes: 'hsl(var(--yes))',
+        no: 'hsl(var(--no))',
+        warn: 'hsl(var(--warn))',
+        live: 'hsl(var(--live))',
         chart: {
           '1': 'hsl(var(--chart-1))',
           '2': 'hsl(var(--chart-2))',
@@ -69,20 +71,12 @@ const config: Config = {
       },
       keyframes: {
         'accordion-down': {
-          from: {
-            height: '0',
-          },
-          to: {
-            height: 'var(--radix-accordion-content-height)',
-          },
+          from: { height: '0' },
+          to: { height: 'var(--radix-accordion-content-height)' },
         },
         'accordion-up': {
-          from: {
-            height: 'var(--radix-accordion-content-height)',
-          },
-          to: {
-            height: '0',
-          },
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: '0' },
         },
         'fade-in': {
           from: { opacity: '0', transform: 'translateY(8px)' },
@@ -91,6 +85,14 @@ const config: Config = {
         'fade-out': {
           from: { opacity: '1' },
           to: { opacity: '0' },
+        },
+        tape: {
+          from: { transform: 'translateX(0)' },
+          to: { transform: 'translateX(-50%)' },
+        },
+        'pulse-live': {
+          '0%': { transform: 'scale(0.6)', opacity: '0.7' },
+          '100%': { transform: 'scale(1.8)', opacity: '0' },
         },
       },
       transitionDuration: {
@@ -103,6 +105,11 @@ const config: Config = {
         'accordion-up': 'accordion-up 0.2s ease-out',
         'fade-in': 'fade-in 0.4s ease-out',
         'fade-out': 'fade-out 0.2s ease-out',
+        tape: 'tape 42s linear infinite',
+        'pulse-live': 'pulse-live 1.6s ease-out infinite',
+      },
+      boxShadow: {
+        lift: 'var(--shadow-lift)',
       },
     },
   },
